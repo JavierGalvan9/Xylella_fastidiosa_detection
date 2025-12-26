@@ -1,0 +1,11 @@
+tensorflow
+scikit-learn
+pandas
+numpy
+gdal
+matplotlib
+numba
+shap
+mlflow
+hydra-core
+omegaconf

@@ -36,46 +36,76 @@ def clean_nodata_values(raster_array, nodatavalue):
     clean_raster = raster_array[mask]
     return clean_raster, mask
 
+# def old_getPointCoordinates(ds):
+#     # https://stackoverflow.com/questions/2922532/obtain-latitude-and-longitude-from-a-geotiff-file
+#     # get the existing coordinate system
+#     old_cs= osr.SpatialReference()
+#     old_cs.ImportFromWkt(ds.GetProjectionRef())
+
+#     # create the new coordinate system
+#     wgs84_wkt = """
+#     GEOGCS["WGS 84",
+#         DATUM["WGS_1984",
+#             SPHEROID["WGS 84",6378137,298.257223563,
+#                 AUTHORITY["EPSG","7030"]],
+#             AUTHORITY["EPSG","6326"]],
+#         PRIMEM["Greenwich",0,
+#             AUTHORITY["EPSG","8901"]],
+#         UNIT["degree",0.0174532925199433,
+#             AUTHORITY["EPSG","9122"]],
+#         AUTHORITY["EPSG","4326"]]"""
+    
+#     # UNIT["degree",0.01745329251994328
+    
+#     new_cs = osr.SpatialReference()
+#     new_cs.ImportFromWkt(wgs84_wkt)
+
+#     # create a transform object to convert between coordinate systems
+#     transform = osr.CoordinateTransformation(old_cs,new_cs) 
+
+#     #get the point to transform, pixel (0,0) in this case
+#     width = ds.RasterXSize
+#     height = ds.RasterYSize
+#     gt = ds.GetGeoTransform()
+#     minx = gt[0]
+#     miny = gt[3] + width*gt[4] + height*gt[5] 
+#     maxx = gt[0] + width*gt[1] + height*gt[2]
+#     maxy = gt[3] 
+
+#     #get the coordinates in lat long
+#     lat1, long1, _ = transform.TransformPoint(minx,miny) 
+#     lat2, long2, _ = transform.TransformPoint(maxx,maxy)
+    
+#     lats = np.linspace(lat2, lat1, height)
+#     longs = np.linspace(long1, long2, width)
+    
+#     xs, ys = np.meshgrid(longs, lats)
+    
+#     return xs, ys
+
 def getPointCoordinates(ds):
-    # https://stackoverflow.com/questions/2922532/obtain-latitude-and-longitude-from-a-geotiff-file
-    # get the existing coordinate system
+    # Open the TIF file and get its geotransform and projection information
     old_cs= osr.SpatialReference()
     old_cs.ImportFromWkt(ds.GetProjectionRef())
-
     # create the new coordinate system
-    wgs84_wkt = """
-    GEOGCS["WGS 84",
-        DATUM["WGS_1984",
-            SPHEROID["WGS 84",6378137,298.257223563,
-                AUTHORITY["EPSG","7030"]],
-            AUTHORITY["EPSG","6326"]],
-        PRIMEM["Greenwich",0,
-            AUTHORITY["EPSG","8901"]],
-        UNIT["degree",0.01745329251994328,
-            AUTHORITY["EPSG","9122"]],
-        AUTHORITY["EPSG","4326"]]"""
     new_cs = osr.SpatialReference()
-    new_cs .ImportFromWkt(wgs84_wkt)
-
+    new_cs.ImportFromEPSG(4326) # EPSG code for WGS84
     # create a transform object to convert between coordinate systems
     transform = osr.CoordinateTransformation(old_cs,new_cs) 
-
-    #get the point to transform, pixel (0,0) in this case
-    width = ds.RasterXSize
-    height = ds.RasterYSize
+    # Get the number of rows and columns in the TIF file
+    cols = ds.RasterXSize
+    rows = ds.RasterYSize
     gt = ds.GetGeoTransform()
     minx = gt[0]
-    miny = gt[3] + width*gt[4] + height*gt[5] 
-    maxx = gt[0] + width*gt[1] + height*gt[2]
+    miny = gt[3] + cols*gt[4] + (rows-1)*gt[5] 
+    maxx = gt[0] + (cols-1)*gt[1] + rows*gt[2]
     maxy = gt[3] 
-
     #get the coordinates in lat long
     lat1, long1, _ = transform.TransformPoint(minx,miny) 
     lat2, long2, _ = transform.TransformPoint(maxx,maxy)
-    
-    lats = np.linspace(lat2, lat1, height)
-    longs = np.linspace(long1, long2, width)
-    
+    # Create a meshgrid of the coordinates
+    lats = np.linspace(lat2, lat1, rows)
+    longs = np.linspace(long1, long2, cols)
     xs, ys = np.meshgrid(longs, lats)
     
     return xs, ys
@@ -255,8 +285,10 @@ def getMultiRasterBands(raster_file,
 #        df = df.sort_values(["treeID"], ascending = True)
     
     if save_dataframe:
-        file_management.save_lzma(df, os.path.join(save_file, 'dataset.lzma'), '')
-        file_management.save_lzma(metadata_df, os.path.join(save_file, 'metadata_df.lzma'), '')  
+        # file_management.save_lzma(df, os.path.join(save_file, 'dataset.lzma'), '')
+        # file_management.save_lzma(metadata_df, os.path.join(save_file, 'metadata_df.lzma'), '')  
+        file_management.save_pickle(df, os.path.join(save_file, 'dataset'), '')
+        file_management.save_pickle(metadata_df, os.path.join(save_file, 'metadata_df'), '')  
 #         df.to_csv('dataset.csv', index = True, header=True)
 #         f = open("metadata_df.pkl","wb")
 #         pickle.dump(metadata_df,f)

@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "xylella-ml"
+version = "0.1.0"
+description = "Xylella fastidiosa detection ML project"
+authors = ["Your Name <your@email.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.12"
+tensorflow = "*"
+scikit-learn = "*"
+pandas = "*"
+numpy = "*"
+gdal = "*"
+matplotlib = "*"
+numba = "*"
+shap = "*"
+mlflow = "*"
+hydra-core = "*"
+omegaconf = "*"
+

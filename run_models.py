@@ -4,23 +4,23 @@ import subprocess
 
 parameters = {
     'oversampling': ['oversampling'],
-    'n_hidden_layers': ['0', '1', '2', '3', '4', '5']
+    'n_hidden_layers': ['0']
 }
 
-n_hidden_layers = ['1', '2', '3', '4', '5']
+n_hidden_layers = ['1'] #['1', '2', '3', '4', '5']
 
 for n_hidden in n_hidden_layers:
     # Create string with all the items of the combination
-    combination_string = " --n_hidden_layers {n_hidden}".format(n_hidden=n_hidden)
+    combination_string = " --n_hidden_layers {n_hidden} --no-use_indices --use_spectral_bands".format(n_hidden=n_hidden)
     # Create the bashCommand which contains a string of the python program inside a string of the bash command
     # and the parameters of the python program
     pythonCommand = f"python xylella_detection_nn.py"
     pythonCommand += combination_string
     # Create the output and error files
-    out_error_Command = f"touch Out/{n_hidden}.out Error/{n_hidden}.err"
+    out_error_Command = f"touch Out/{n_hidden}_zeropadding.out Error/{n_hidden}_zeropadding.err"
     subprocess.run(out_error_Command, shell=True, check=True)
     # Create the bashCommand which contains the pythonCommand inside a string of the bash command
-    bashCommand = f"/usr/local/bin/run -c 1 -m 5 -j {n_hidden} -t 20:30 -o Out/{n_hidden}.out -e Error/{n_hidden}.err '{pythonCommand}'"
+    bashCommand = f"/usr/local/bin/run -c 1 -m 5 -j {n_hidden} -t 20:30 -o Out/{n_hidden}_zeropadding.out -e Error/{n_hidden}_zeropadding.err '{pythonCommand}'"
     subprocess.run(bashCommand, shell=True, check=True)
 
 ## Run all the bashCommands with all the possible combinations of parameters

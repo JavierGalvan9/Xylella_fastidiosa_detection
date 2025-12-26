@@ -1,17 +1,20 @@
-__pycache__
-.ipynb_checkpoints
+*.pyc
+__pycache__/
+.env
+*.env
+.DS_Store
+.ipynb_checkpoints/
+legacy/*
+Old code/
+archive/
+Images
+Processed Data old/
 .vscode
-Data
-Error
-Out
-general_utils/__pycache__
-Old code
-Processed Data
-Trees segmentation
-Untitled.ipynb
-xylella_detection_cnn.py 
-xylella_detection_nn.sh
-Xylella_detection_nn.ipynb
-Classification results
-Classification datasets
-ann_best_classifier.h5
+.github
+Classification datasets/Train and test sets/Spectral bands and indices/cluster_id_test.lzma
+Classification datasets/
+Classification results/
+Error/
+Out/
+Processed Data/
+Classification datasets/Train and test sets/Spectral bands and indices/cluster_id_train.lzma
